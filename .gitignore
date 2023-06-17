@@ -1,0 +1,7 @@
+.vscode
+bin
+ics-manager
+!ics-manager/
+tmp
+token
+token_test
