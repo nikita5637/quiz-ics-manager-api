@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"bytes"
 	"time"
 
 	ics "github.com/arran4/golang-ical"
@@ -34,7 +35,7 @@ func (g *Generator) Generate(summary, address, description, url string, gameDate
 	event.SetEndAt(gameDateTime.Add(2 * time.Hour))
 	event.SetDtStampTime(now)
 	event.SetStartAt(gameDateTime)
-	event.SetLocation(address)
+	event.SetLocation(string(bytes.Replace([]byte(address), []byte{0xd}, []byte{}, -1)))
 	event.SetSequence(0)
 	event.SetSummary(summary)
 	event.SetTimeTransparency(ics.TransparencyOpaque)
