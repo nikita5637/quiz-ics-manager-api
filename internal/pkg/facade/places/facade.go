@@ -17,9 +17,10 @@ type Config struct {
 	TxManager    *tx.Manager
 }
 
-// NewFacade ...
-func NewFacade(cfg Config) *Facade {
+// New ...
+func New(cfg Config) *Facade {
 	return &Facade{
+		db:           cfg.TxManager,
 		placeStorage: cfg.PlaceStorage,
 	}
 }

@@ -70,7 +70,7 @@ func Start(ctx context.Context) error {
 		PlaceStorage: placeStorage,
 		TxManager:    txManager,
 	}
-	placesFacade := places.NewFacade(placesFacadeConfig)
+	placesFacade := places.New(placesFacadeConfig)
 
 	icsMessageHandlerConfig := icsmessage.Config{
 		IcsFileExtension:         config.GetValue("ICSFileExtension").String(),
