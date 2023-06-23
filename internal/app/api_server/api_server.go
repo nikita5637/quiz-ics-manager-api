@@ -18,6 +18,7 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
+// Start ...
 func Start(ctx context.Context) error {
 	var opts []grpc.ServerOption
 	opts = append(opts, grpc.ChainUnaryInterceptor(

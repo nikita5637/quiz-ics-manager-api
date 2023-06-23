@@ -38,7 +38,7 @@ func (a *ICSFileStorageAdapter) GetICSFileByID(ctx context.Context, id int) (*Ic
 	return a.icsFileStorage.GetIcsFileByID(ctx, id)
 }
 
-// GetICSFileByGameID ...
+// GetICSFileByExternalGameID ...
 func (a *ICSFileStorageAdapter) GetICSFileByExternalGameID(ctx context.Context, externalGameID int) (*IcsFile, error) {
 	return a.icsFileStorage.GetIcsFileByExternalGameID(ctx, externalGameID)
 }

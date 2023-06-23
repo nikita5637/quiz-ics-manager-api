@@ -14,6 +14,7 @@ import (
 	registratorpb "github.com/nikita5637/quiz-registrator-api/pkg/pb/registrator"
 )
 
+// Handle ...
 func (h *Handler) Handle(ctx context.Context, event ics.Event) error {
 	switch event.Event {
 	case ics.EventRegistered:
@@ -71,7 +72,7 @@ func (h *Handler) Handle(ctx context.Context, event ics.Event) error {
 
 		// create file begin
 		name := uuid.New().String() + h.icsFileExtension
-		icsFile, err := os.Create(h.icsFilesFolder + name)
+		icsFile, err := os.Create(h.icsFilesFolder + name) //nolint:gosec
 		if err != nil {
 			return fmt.Errorf("create ICS file error: %w", err)
 		}
@@ -103,9 +104,9 @@ func (h *Handler) Handle(ctx context.Context, event ics.Event) error {
 			if errors.Is(err, model.ErrICSFileNotFound) {
 				logger.Warnf(ctx, "ICS file for game ID %d not found", event.GameID)
 				return nil
-			} else {
-				return fmt.Errorf("get ICS file by game ID error: %w", err)
 			}
+
+			return fmt.Errorf("get ICS file by game ID error: %w", err)
 		}
 
 		err = h.icsFilesFacade.DeleteICSFile(ctx, icsFile.ID)
