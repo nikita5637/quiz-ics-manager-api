@@ -10,7 +10,7 @@ import (
 	"github.com/nikita5637/quiz-ics-manager-api/internal/pkg/logger"
 	"github.com/nikita5637/quiz-ics-manager-api/internal/pkg/model"
 	"github.com/nikita5637/quiz-registrator-api/pkg/ics"
-	pkgmodel "github.com/nikita5637/quiz-registrator-api/pkg/model"
+	leaguepb "github.com/nikita5637/quiz-registrator-api/pkg/pb/league"
 	registratorpb "github.com/nikita5637/quiz-registrator-api/pkg/pb/registrator"
 )
 
@@ -35,7 +35,7 @@ func (h *Handler) Handle(ctx context.Context, event ics.Event) error {
 			return fmt.Errorf("get game by ID error: %w", err)
 		}
 
-		league, err := h.registratorServiceClient.GetLeagueByID(ctx, &registratorpb.GetLeagueByIDRequest{
+		pbLeague, err := h.leagueServiceClient.GetLeague(ctx, &leaguepb.GetLeagueRequest{
 			Id: game.GetGame().GetLeagueId(),
 		})
 		if err != nil {
@@ -43,7 +43,7 @@ func (h *Handler) Handle(ctx context.Context, event ics.Event) error {
 		}
 
 		url := ""
-		if league.GetLeague().GetId() == pkgmodel.LeagueQuizPlease {
+		if pbLeague.GetId() == int32(leaguepb.LeagueID_LEAGUE_ID_QUIZ_PLEASE) {
 			url = fmt.Sprintf("https://spb.quizplease.ru/game-page?id=%d", game.GetGame().GetExternalId())
 		}
 
@@ -63,7 +63,7 @@ func (h *Handler) Handle(ctx context.Context, event ics.Event) error {
 			address = placeAddress
 		}
 
-		summary := getSummary(league.GetLeague().GetName(), game.GetGame().GetNumber())
+		summary := getSummary(pbLeague.GetName(), game.GetGame().GetNumber())
 
 		generatedICS, err := h.icsGenerator.Generate(summary, address, "", url, game.GetGame().GetDate().AsTime())
 		if err != nil {
