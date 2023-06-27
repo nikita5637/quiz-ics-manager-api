@@ -2,6 +2,7 @@
 //go:generate mockery --case underscore --name ICSGenerator --with-expecter
 //go:generate mockery --case underscore --name PlacesFacade --with-expecter
 //go:generate mockery --case underscore --name LeagueServiceClient --with-expecter
+//go:generate mockery --case underscore --name PlaceServiceClient --with-expecter
 //go:generate mockery --case underscore --name RegistratorServiceClient --with-expecter
 
 package icsmessage
@@ -12,6 +13,7 @@ import (
 
 	"github.com/nikita5637/quiz-ics-manager-api/internal/pkg/model"
 	leaguepb "github.com/nikita5637/quiz-registrator-api/pkg/pb/league"
+	placepb "github.com/nikita5637/quiz-registrator-api/pkg/pb/place"
 	registratorpb "github.com/nikita5637/quiz-registrator-api/pkg/pb/registrator"
 	"google.golang.org/grpc"
 )
@@ -33,15 +35,19 @@ type PlacesFacade interface {
 	GetAppleAddressByPlaceID(ctx context.Context, placeID int32) (string, error)
 }
 
-// RegistratorServiceClient ...
-type RegistratorServiceClient interface {
-	GetGameByID(ctx context.Context, in *registratorpb.GetGameByIDRequest, opts ...grpc.CallOption) (*registratorpb.GetGameByIDResponse, error)
-	GetPlaceByID(ctx context.Context, in *registratorpb.GetPlaceByIDRequest, opts ...grpc.CallOption) (*registratorpb.GetPlaceByIDResponse, error)
-}
-
 // LeagueServiceClient ...
 type LeagueServiceClient interface {
 	GetLeague(ctx context.Context, in *leaguepb.GetLeagueRequest, opts ...grpc.CallOption) (*leaguepb.League, error)
+}
+
+// PlaceServiceClient ...
+type PlaceServiceClient interface {
+	GetPlace(ctx context.Context, in *placepb.GetPlaceRequest, opts ...grpc.CallOption) (*placepb.Place, error)
+}
+
+// RegistratorServiceClient ...
+type RegistratorServiceClient interface {
+	GetGameByID(ctx context.Context, in *registratorpb.GetGameByIDRequest, opts ...grpc.CallOption) (*registratorpb.GetGameByIDResponse, error)
 }
 
 // Handler ...
@@ -53,6 +59,7 @@ type Handler struct {
 	placesFacade     PlacesFacade
 
 	leagueServiceClient      LeagueServiceClient
+	placeServiceClient       PlaceServiceClient
 	registratorServiceClient RegistratorServiceClient
 }
 
@@ -65,6 +72,7 @@ type Config struct {
 	PlacesFacade     PlacesFacade
 
 	LeagueServiceClient      LeagueServiceClient
+	PlaceServiceClient       PlaceServiceClient
 	RegistratorServiceClient RegistratorServiceClient
 }
 
@@ -78,6 +86,7 @@ func New(cfg Config) *Handler {
 		placesFacade:     cfg.PlacesFacade,
 
 		leagueServiceClient:      cfg.LeagueServiceClient,
+		placeServiceClient:       cfg.PlaceServiceClient,
 		registratorServiceClient: cfg.RegistratorServiceClient,
 	}
 }

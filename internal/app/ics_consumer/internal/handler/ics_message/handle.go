@@ -11,6 +11,7 @@ import (
 	"github.com/nikita5637/quiz-ics-manager-api/internal/pkg/model"
 	"github.com/nikita5637/quiz-registrator-api/pkg/ics"
 	leaguepb "github.com/nikita5637/quiz-registrator-api/pkg/pb/league"
+	placepb "github.com/nikita5637/quiz-registrator-api/pkg/pb/place"
 	registratorpb "github.com/nikita5637/quiz-registrator-api/pkg/pb/registrator"
 )
 
@@ -43,20 +44,20 @@ func (h *Handler) Handle(ctx context.Context, event ics.Event) error {
 		}
 
 		url := ""
-		if pbLeague.GetId() == int32(leaguepb.LeagueID_LEAGUE_ID_QUIZ_PLEASE) {
+		if pbLeague.GetId() == int32(leaguepb.LeagueID_QUIZ_PLEASE) {
 			url = fmt.Sprintf("https://spb.quizplease.ru/game-page?id=%d", game.GetGame().GetExternalId())
 		}
 
-		place, err := h.registratorServiceClient.GetPlaceByID(ctx, &registratorpb.GetPlaceByIDRequest{
+		pbPlace, err := h.placeServiceClient.GetPlace(ctx, &placepb.GetPlaceRequest{
 			Id: game.GetGame().GetPlaceId(),
 		})
 		if err != nil {
 			return fmt.Errorf("get place by ID error: %w", err)
 		}
 
-		address := place.GetPlace().GetAddress()
+		address := pbPlace.GetAddress()
 
-		placeAddress, err := h.placesFacade.GetAppleAddressByPlaceID(ctx, place.GetPlace().GetId())
+		placeAddress, err := h.placesFacade.GetAppleAddressByPlaceID(ctx, pbPlace.GetId())
 		if err != nil {
 			logger.Warnf(ctx, "get apple address by place ID error: %s", err.Error())
 		} else {

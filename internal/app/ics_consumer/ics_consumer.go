@@ -18,6 +18,7 @@ import (
 	"github.com/nikita5637/quiz-ics-manager-api/internal/pkg/tx"
 	ics "github.com/nikita5637/quiz-registrator-api/pkg/ics"
 	leaguepb "github.com/nikita5637/quiz-registrator-api/pkg/pb/league"
+	placepb "github.com/nikita5637/quiz-registrator-api/pkg/pb/place"
 	registratorpb "github.com/nikita5637/quiz-registrator-api/pkg/pb/registrator"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"google.golang.org/grpc"
@@ -37,14 +38,19 @@ func Start(ctx context.Context) error {
 		return fmt.Errorf("could not connect: %w", err)
 	}
 
-	registratorServiceClient, err := getRegistratorServiceClient(ctx, registratorAPIConn)
-	if err != nil {
-		return fmt.Errorf("get registrator service client error: %w", err)
-	}
-
 	leagueServiceClient, err := getLeagueServiceClient(ctx, registratorAPIConn)
 	if err != nil {
 		return fmt.Errorf("get league service client error: %w", err)
+	}
+
+	placeServiceClient, err := getPlaceServiceClient(ctx, registratorAPIConn)
+	if err != nil {
+		return fmt.Errorf("get place service client error: %w", err)
+	}
+
+	registratorServiceClient, err := getRegistratorServiceClient(ctx, registratorAPIConn)
+	if err != nil {
+		return fmt.Errorf("get registrator service client error: %w", err)
 	}
 
 	rabbitMQConn, err := amqp.Dial(config.GetRabbitMQURL())
@@ -98,6 +104,7 @@ func Start(ctx context.Context) error {
 		PlacesFacade:     placesFacade,
 
 		LeagueServiceClient:      leagueServiceClient,
+		PlaceServiceClient:       placeServiceClient,
 		RegistratorServiceClient: registratorServiceClient,
 	}
 	icsMessageHandler := icsmessage.New(icsMessageHandlerConfig)
@@ -160,10 +167,14 @@ func getICSMessages(channel *amqp.Channel) (<-chan amqp.Delivery, error) {
 	return icsMessages, nil
 }
 
-func getRegistratorServiceClient(ctx context.Context, conn *grpc.ClientConn) (registratorpb.RegistratorServiceClient, error) {
-	return registratorpb.NewRegistratorServiceClient(conn), nil
-}
-
 func getLeagueServiceClient(ctx context.Context, conn *grpc.ClientConn) (leaguepb.ServiceClient, error) {
 	return leaguepb.NewServiceClient(conn), nil
+}
+
+func getPlaceServiceClient(ctx context.Context, conn *grpc.ClientConn) (placepb.ServiceClient, error) {
+	return placepb.NewServiceClient(conn), nil
+}
+
+func getRegistratorServiceClient(ctx context.Context, conn *grpc.ClientConn) (registratorpb.RegistratorServiceClient, error) {
+	return registratorpb.NewRegistratorServiceClient(conn), nil
 }

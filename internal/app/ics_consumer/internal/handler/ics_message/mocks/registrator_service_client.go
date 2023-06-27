@@ -87,68 +87,6 @@ func (_c *RegistratorServiceClient_GetGameByID_Call) Return(_a0 *registrator.Get
 	return _c
 }
 
-// GetPlaceByID provides a mock function with given fields: ctx, in, opts
-func (_m *RegistratorServiceClient) GetPlaceByID(ctx context.Context, in *registrator.GetPlaceByIDRequest, opts ...grpc.CallOption) (*registrator.GetPlaceByIDResponse, error) {
-	_va := make([]interface{}, len(opts))
-	for _i := range opts {
-		_va[_i] = opts[_i]
-	}
-	var _ca []interface{}
-	_ca = append(_ca, ctx, in)
-	_ca = append(_ca, _va...)
-	ret := _m.Called(_ca...)
-
-	var r0 *registrator.GetPlaceByIDResponse
-	if rf, ok := ret.Get(0).(func(context.Context, *registrator.GetPlaceByIDRequest, ...grpc.CallOption) *registrator.GetPlaceByIDResponse); ok {
-		r0 = rf(ctx, in, opts...)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*registrator.GetPlaceByIDResponse)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, *registrator.GetPlaceByIDRequest, ...grpc.CallOption) error); ok {
-		r1 = rf(ctx, in, opts...)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// RegistratorServiceClient_GetPlaceByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPlaceByID'
-type RegistratorServiceClient_GetPlaceByID_Call struct {
-	*mock.Call
-}
-
-// GetPlaceByID is a helper method to define mock.On call
-//  - ctx context.Context
-//  - in *registrator.GetPlaceByIDRequest
-//  - opts ...grpc.CallOption
-func (_e *RegistratorServiceClient_Expecter) GetPlaceByID(ctx interface{}, in interface{}, opts ...interface{}) *RegistratorServiceClient_GetPlaceByID_Call {
-	return &RegistratorServiceClient_GetPlaceByID_Call{Call: _e.mock.On("GetPlaceByID",
-		append([]interface{}{ctx, in}, opts...)...)}
-}
-
-func (_c *RegistratorServiceClient_GetPlaceByID_Call) Run(run func(ctx context.Context, in *registrator.GetPlaceByIDRequest, opts ...grpc.CallOption)) *RegistratorServiceClient_GetPlaceByID_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		variadicArgs := make([]grpc.CallOption, len(args)-2)
-		for i, a := range args[2:] {
-			if a != nil {
-				variadicArgs[i] = a.(grpc.CallOption)
-			}
-		}
-		run(args[0].(context.Context), args[1].(*registrator.GetPlaceByIDRequest), variadicArgs...)
-	})
-	return _c
-}
-
-func (_c *RegistratorServiceClient_GetPlaceByID_Call) Return(_a0 *registrator.GetPlaceByIDResponse, _a1 error) *RegistratorServiceClient_GetPlaceByID_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
 type mockConstructorTestingTNewRegistratorServiceClient interface {
 	mock.TestingT
 	Cleanup(func())
