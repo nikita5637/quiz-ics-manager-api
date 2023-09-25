@@ -12,7 +12,7 @@ require (
 	github.com/golangci/golangci-lint v1.50.1
 	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
-	github.com/nikita5637/quiz-registrator-api v1.2.21
+	github.com/nikita5637/quiz-registrator-api v1.3.24
 	github.com/rabbitmq/amqp091-go v1.6.0
 	github.com/stretchr/testify v1.8.1
 	github.com/xo/xo v0.0.0-20220107024827-d70880d59a86

@@ -10,9 +10,9 @@ import (
 	"github.com/nikita5637/quiz-ics-manager-api/internal/pkg/logger"
 	"github.com/nikita5637/quiz-ics-manager-api/internal/pkg/model"
 	"github.com/nikita5637/quiz-registrator-api/pkg/ics"
+	gamepb "github.com/nikita5637/quiz-registrator-api/pkg/pb/game"
 	leaguepb "github.com/nikita5637/quiz-registrator-api/pkg/pb/league"
 	placepb "github.com/nikita5637/quiz-registrator-api/pkg/pb/place"
-	registratorpb "github.com/nikita5637/quiz-registrator-api/pkg/pb/registrator"
 )
 
 // Handle ...
@@ -29,15 +29,15 @@ func (h *Handler) Handle(ctx context.Context, event ics.Event) error {
 			return fmt.Errorf("get ICS file by game ID error: %w", err)
 		}
 
-		game, err := h.registratorServiceClient.GetGameByID(ctx, &registratorpb.GetGameByIDRequest{
-			GameId: event.GameID,
+		game, err := h.gameServiceClient.GetGame(ctx, &gamepb.GetGameRequest{
+			Id: event.GameID,
 		})
 		if err != nil {
 			return fmt.Errorf("get game by ID error: %w", err)
 		}
 
 		pbLeague, err := h.leagueServiceClient.GetLeague(ctx, &leaguepb.GetLeagueRequest{
-			Id: game.GetGame().GetLeagueId(),
+			Id: int32(game.GetLeagueId()),
 		})
 		if err != nil {
 			return fmt.Errorf("get league by ID error: %w", err)
@@ -45,11 +45,13 @@ func (h *Handler) Handle(ctx context.Context, event ics.Event) error {
 
 		url := ""
 		if pbLeague.GetId() == int32(leaguepb.LeagueID_QUIZ_PLEASE) {
-			url = fmt.Sprintf("https://spb.quizplease.ru/game-page?id=%d", game.GetGame().GetExternalId())
+			if externalID := game.GetExternalId(); externalID != nil {
+				url = fmt.Sprintf("https://spb.quizplease.ru/game-page?id=%d", externalID.GetValue())
+			}
 		}
 
 		pbPlace, err := h.placeServiceClient.GetPlace(ctx, &placepb.GetPlaceRequest{
-			Id: game.GetGame().GetPlaceId(),
+			Id: game.GetPlaceId(),
 		})
 		if err != nil {
 			return fmt.Errorf("get place by ID error: %w", err)
@@ -64,9 +66,9 @@ func (h *Handler) Handle(ctx context.Context, event ics.Event) error {
 			address = placeAddress
 		}
 
-		summary := getSummary(pbLeague.GetName(), game.GetGame().GetNumber())
+		summary := getSummary(pbLeague.GetName(), game.GetNumber())
 
-		generatedICS, err := h.icsGenerator.Generate(summary, address, "", url, game.GetGame().GetDate().AsTime())
+		generatedICS, err := h.icsGenerator.Generate(summary, address, "", url, game.GetDate().AsTime())
 		if err != nil {
 			return fmt.Errorf("generate ICS error: %w", err)
 		}

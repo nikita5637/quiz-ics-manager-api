@@ -17,9 +17,9 @@ import (
 	"github.com/nikita5637/quiz-ics-manager-api/internal/pkg/storage"
 	"github.com/nikita5637/quiz-ics-manager-api/internal/pkg/tx"
 	ics "github.com/nikita5637/quiz-registrator-api/pkg/ics"
+	gamepb "github.com/nikita5637/quiz-registrator-api/pkg/pb/game"
 	leaguepb "github.com/nikita5637/quiz-registrator-api/pkg/pb/league"
 	placepb "github.com/nikita5637/quiz-registrator-api/pkg/pb/place"
-	registratorpb "github.com/nikita5637/quiz-registrator-api/pkg/pb/registrator"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"google.golang.org/grpc"
 )
@@ -48,9 +48,9 @@ func Start(ctx context.Context) error {
 		return fmt.Errorf("get place service client error: %w", err)
 	}
 
-	registratorServiceClient, err := getRegistratorServiceClient(ctx, registratorAPIConn)
+	gameServiceClient, err := getGameServiceClient(ctx, registratorAPIConn)
 	if err != nil {
-		return fmt.Errorf("get registrator service client error: %w", err)
+		return fmt.Errorf("get game service client error: %w", err)
 	}
 
 	rabbitMQConn, err := amqp.Dial(config.GetRabbitMQURL())
@@ -103,9 +103,9 @@ func Start(ctx context.Context) error {
 		ICSGenerator:     icsGenerator,
 		PlacesFacade:     placesFacade,
 
-		LeagueServiceClient:      leagueServiceClient,
-		PlaceServiceClient:       placeServiceClient,
-		RegistratorServiceClient: registratorServiceClient,
+		GameServiceClient:   gameServiceClient,
+		LeagueServiceClient: leagueServiceClient,
+		PlaceServiceClient:  placeServiceClient,
 	}
 	icsMessageHandler := icsmessage.New(icsMessageHandlerConfig)
 
@@ -175,6 +175,6 @@ func getPlaceServiceClient(ctx context.Context, conn *grpc.ClientConn) (placepb.
 	return placepb.NewServiceClient(conn), nil
 }
 
-func getRegistratorServiceClient(ctx context.Context, conn *grpc.ClientConn) (registratorpb.RegistratorServiceClient, error) {
-	return registratorpb.NewRegistratorServiceClient(conn), nil
+func getGameServiceClient(ctx context.Context, conn *grpc.ClientConn) (gamepb.ServiceClient, error) {
+	return gamepb.NewServiceClient(conn), nil
 }
