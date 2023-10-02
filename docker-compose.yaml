@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  ics-manager-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        GITHUB_PATH: https://github.com/nikita5637/quiz-ics-manager-api.git
+        BRANCH: v1.0
+    command: "/bin/ics-manager-api --config /etc/config.toml"
+    container_name: ics-manager-api
+    environment:
+      DATABASE_PASSWORD: quiz_regbot
+      RABBITMQ_PASSWORD: quiz_regbot
+    networks:
+      - network
+    ports:
+      - "8082:8082"
+    volumes:
+      - icsdata:/var/www/quiz/ics/
+
+volumes:
+  icsdata:
+    driver: local
+
+networks:
+  network:
+    driver: bridge
