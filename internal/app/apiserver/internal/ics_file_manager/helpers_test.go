@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/nikita5637/quiz-ics-manager-api/internal/app/api_server/internal/ics_file_manager/mocks"
+	"github.com/nikita5637/quiz-ics-manager-api/internal/app/apiserver/internal/ics_file_manager/mocks"
 )
 
 type fixture struct {

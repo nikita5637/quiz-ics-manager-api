@@ -21,14 +21,15 @@ import (
 	leaguepb "github.com/nikita5637/quiz-registrator-api/pkg/pb/league"
 	placepb "github.com/nikita5637/quiz-registrator-api/pkg/pb/place"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 )
 
 // Start ...
 func Start(ctx context.Context) error {
 	opts := grpc.WithInsecure()
-	registratorAPIAddress := config.GetValue("RegistratorAPIAddress").String()
-	registratorAPIPort := config.GetValue("RegistratorAPIPort").Uint16()
+	registratorAPIAddress := viper.GetString("ics_consumer.registrator_api.address")
+	registratorAPIPort := viper.GetUint32("ics_consumer.registrator_api.port")
 	target := fmt.Sprintf("%s:%d", registratorAPIAddress, registratorAPIPort)
 	registratorAPIConn, err := grpc.DialContext(ctx, target, opts, grpc.WithChainUnaryInterceptor(
 		logmiddleware.New().Log(),
@@ -72,7 +73,8 @@ func Start(ctx context.Context) error {
 
 	icsGenerator := generator.New()
 
-	db, err := storage.NewDB()
+	driverName := viper.GetString("database.driver")
+	db, err := storage.NewDB(ctx, driverName)
 	if err != nil {
 		logger.Fatalf(ctx, "new DB initialization error: %s", err.Error())
 	}
@@ -80,7 +82,7 @@ func Start(ctx context.Context) error {
 
 	txManager := tx.NewManager(db)
 
-	icsFileStorage := storage.NewICSFileStorage(txManager)
+	icsFileStorage := storage.NewICSFileStorage(driverName, txManager)
 
 	icsFilesFacadeConfig := icsfiles.Config{
 		ICSFileStorage: icsFileStorage,
@@ -88,7 +90,7 @@ func Start(ctx context.Context) error {
 	}
 	icsFilesFacade := icsfiles.NewFacade(icsFilesFacadeConfig)
 
-	placeStorage := storage.NewPlaceStorage(txManager)
+	placeStorage := storage.NewPlaceStorage(driverName, txManager)
 
 	placesFacadeConfig := places.Config{
 		PlaceStorage: placeStorage,
@@ -97,9 +99,9 @@ func Start(ctx context.Context) error {
 	placesFacade := places.New(placesFacadeConfig)
 
 	icsMessageHandlerConfig := icsmessage.Config{
-		IcsFileExtension: config.GetValue("ICSFileExtension").String(),
+		IcsFileExtension: viper.GetString("ics_consumer.ics_file_extension"),
 		ICSFilesFacade:   icsFilesFacade,
-		IcsFilesFolder:   config.GetValue("ICSFilesFolder").String(),
+		IcsFilesFolder:   viper.GetString("ics_consumer.ics_files_folder"),
 		ICSGenerator:     icsGenerator,
 		PlacesFacade:     placesFacade,
 
@@ -134,7 +136,7 @@ func Start(ctx context.Context) error {
 }
 
 func getICSMessages(channel *amqp.Channel) (<-chan amqp.Delivery, error) {
-	icsQueueName := config.GetValue("RabbitMQICSQueueName").String()
+	icsQueueName := viper.GetString("ics_consumer.rabbitmq.queue.name")
 	if icsQueueName == "" {
 		return nil, errors.New("empty rabbit MQ ICS queue name")
 	}

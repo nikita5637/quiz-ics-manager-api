@@ -21,8 +21,8 @@ type ICSFileStorage interface {
 }
 
 // NewICSFileStorage ...
-func NewICSFileStorage(txManager *tx.Manager) ICSFileStorage {
-	switch config.GetValue("Driver").String() {
+func NewICSFileStorage(driver string, txManager *tx.Manager) ICSFileStorage {
+	switch driver {
 	case config.DriverMySQL:
 		return mysql.NewICSFileStorageAdapter(txManager)
 	}

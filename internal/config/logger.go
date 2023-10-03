@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 
+	"github.com/spf13/viper"
 	"go.uber.org/zap"
 )
 
@@ -10,24 +11,21 @@ var (
 	defaultLogLevel = zap.NewAtomicLevelAt(zap.InfoLevel)
 )
 
-// LoggerConfig ...
-type LoggerConfig struct {
-	LogLevel string `toml:"log_level"`
-
-	ElasticAddress     string `toml:"elastic_address"`
-	ElasticIndex       string `toml:"elastic_index"`
-	ElasticLogsEnabled bool   `toml:"elastic_logs_enabled"`
-	ElasticPort        uint16 `toml:"elastic_port"`
+func initLoggerConfigureParams() {
+	_ = viper.BindEnv("log.elastic.address")
 }
 
 // GetElasticAddress ...
 func GetElasticAddress() string {
-	return fmt.Sprintf("http://%s:%d", globalConfig.ElasticAddress, globalConfig.ElasticPort)
+	return fmt.Sprintf("http://%s:%d",
+		viper.GetString("log.elastic.address"),
+		viper.GetUint32("log.elastic.port"),
+	)
 }
 
 // GetLogLevel ...
 func GetLogLevel() zap.AtomicLevel {
-	level, err := zap.ParseAtomicLevel(globalConfig.LogLevel)
+	level, err := zap.ParseAtomicLevel(viper.GetString("log.level"))
 	if err != nil {
 		level = defaultLogLevel
 	}

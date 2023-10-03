@@ -81,7 +81,7 @@ migrations:
 
 .PHONY: run
 run:
-	go run ./cmd/quiz-ics-manager-api
+	go run ./cmd/quiz-ics-manager-api --config ./config.toml
 
 .PHONY: test
 test:

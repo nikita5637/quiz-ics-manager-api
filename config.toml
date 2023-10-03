@@ -1,29 +1,37 @@
-#Log level
-log_level = "info"
-elastic_address = "elasticsearch"
-elastic_port = 9200
-elastic_index = "quiz_regbot"
-elastic_logs_enabled = true
+[apiserver]
+  [apiserver.bind]
+  address = "localhost"
+  port = 8082
 
-#
-# ics manager settings
-#
-bind_address = "0.0.0.0"
-bind_port = 8082
+[database]
+address = "database"
+dbname = "ics_manager_api"
+driver = "mysql"
+port = 3306
+  [database.credentials]
+  username = "quiz_regbot"
+  password = "TOPSECRET"
+
+[ics_consumer]
 ics_file_extension = ".ics"
 ics_files_folder = "/var/www/quiz/ics/"
-rabbitmq_address = "rabbitmq"
-rabbitmq_ics_queue_name = "ics"
-rabbitmq_port = 5672
-rabbitmq_username = "quiz_regbot"
-registrator_api_address = "registrator-api"
-registrator_api_port = 8080
+  [ics_consumer.rabbitmq]
+  address = "rabbitmq"
+  port = 5672
+    [ics_consumer.rabbitmq.credentials]
+    username = "quiz_regbot"
+    password = "TOPSECRET"
+    [ics_consumer.rabbitmq.queue]
+    name = "ics"
+  [ics_consumer.registrator_api]
+  address = "registrator-api"
+  port = 8080
 
-#
-# DB Settings
-#
-driver = "mysql"
-database_address = "mysql"
-database_name = "ics_manager_api"
-database_port = 3306
-database_username = "quiz_regbot"
+[log]
+level = "info"
+module_name = "ics-manager"
+  [log.elastic]
+  address = "elasticsearch"
+  enabled = true
+  index = "quiz_regbot"
+  port = 9200

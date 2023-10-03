@@ -6,14 +6,15 @@ import (
 	"net"
 
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
-	icsfilemanager "github.com/nikita5637/quiz-ics-manager-api/internal/app/api_server/internal/ics_file_manager"
-	logmiddleware "github.com/nikita5637/quiz-ics-manager-api/internal/app/api_server/internal/middleware/log"
+	icsfilemanager "github.com/nikita5637/quiz-ics-manager-api/internal/app/apiserver/internal/ics_file_manager"
+	logmiddleware "github.com/nikita5637/quiz-ics-manager-api/internal/app/apiserver/internal/middleware/log"
 	"github.com/nikita5637/quiz-ics-manager-api/internal/config"
 	"github.com/nikita5637/quiz-ics-manager-api/internal/pkg/facade/icsfiles"
 	"github.com/nikita5637/quiz-ics-manager-api/internal/pkg/logger"
 	"github.com/nikita5637/quiz-ics-manager-api/internal/pkg/storage"
 	"github.com/nikita5637/quiz-ics-manager-api/internal/pkg/tx"
 	icsfilemanagerpb "github.com/nikita5637/quiz-ics-manager-api/pkg/pb/ics_file_manager"
+	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -28,7 +29,8 @@ func Start(ctx context.Context) error {
 	grpcServer := grpc.NewServer(opts...)
 	reflection.Register(grpcServer)
 
-	db, err := storage.NewDB()
+	driverName := viper.GetString("database.driver")
+	db, err := storage.NewDB(ctx, driverName)
 	if err != nil {
 		logger.Fatalf(ctx, "new DB initialization error: %s", err.Error())
 	}
@@ -36,7 +38,7 @@ func Start(ctx context.Context) error {
 
 	txManager := tx.NewManager(db)
 
-	icsFileStorage := storage.NewICSFileStorage(txManager)
+	icsFileStorage := storage.NewICSFileStorage(driverName, txManager)
 
 	icsFilesFacadeConfig := icsfiles.Config{
 		ICSFileStorage: icsFileStorage,
