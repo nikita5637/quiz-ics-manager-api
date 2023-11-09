@@ -37,14 +37,14 @@ func (h *Handler) Handle(ctx context.Context, event ics.Event) error {
 		}
 
 		pbLeague, err := h.leagueServiceClient.GetLeague(ctx, &leaguepb.GetLeagueRequest{
-			Id: int32(game.GetLeagueId()),
+			Id: game.GetLeagueId(),
 		})
 		if err != nil {
 			return fmt.Errorf("get league by ID error: %w", err)
 		}
 
 		url := ""
-		if pbLeague.GetId() == int32(leaguepb.LeagueID_QUIZ_PLEASE) {
+		if pbLeague.GetId() == model.LeagueQuizPlease {
 			if externalID := game.GetExternalId(); externalID != nil {
 				url = fmt.Sprintf("https://spb.quizplease.ru/game-page?id=%d", externalID.GetValue())
 			}
