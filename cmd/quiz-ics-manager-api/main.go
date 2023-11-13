@@ -1,9 +1,7 @@
 package main
 
 import (
-	"context"
 	"os"
-	"os/signal"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/nikita5637/quiz-ics-manager-api/internal/app/apiserver"
@@ -11,6 +9,7 @@ import (
 	"github.com/nikita5637/quiz-ics-manager-api/internal/config"
 	"github.com/nikita5637/quiz-ics-manager-api/internal/pkg/elasticsearch"
 	"github.com/nikita5637/quiz-ics-manager-api/internal/pkg/logger"
+	"github.com/posener/ctxutil"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -23,13 +22,13 @@ func init() {
 }
 
 func main() {
+	ctx := ctxutil.Interrupt()
+
 	pflag.Parse()
 
 	if err := config.ReadConfig(); err != nil {
 		panic(err)
 	}
-
-	ctx := context.Background()
 
 	logsCombiner := &logger.Combiner{}
 	logsCombiner = logsCombiner.WithWriter(os.Stdout)
@@ -54,17 +53,6 @@ func main() {
 		zap.String("module", viper.GetString("log.module_name")),
 	)))
 	logger.InfoKV(ctx, "initialized logger", "log level", logLevel)
-
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-
-	ctx, cancel := context.WithCancel(ctx)
-
-	go func() {
-		oscall := <-c
-		logger.Infof(ctx, "system call recieved: %+v", oscall)
-		cancel()
-	}()
 
 	g, ctx := errgroup.WithContext(ctx)
 

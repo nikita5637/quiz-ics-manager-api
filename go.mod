@@ -12,6 +12,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/nikita5637/quiz-registrator-api v1.4.14
+	github.com/posener/ctxutil v1.0.0
 	github.com/rabbitmq/amqp091-go v1.6.0
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.12.0
