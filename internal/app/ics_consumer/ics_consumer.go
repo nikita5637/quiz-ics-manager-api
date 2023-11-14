@@ -22,6 +22,7 @@ import (
 	placepb "github.com/nikita5637/quiz-registrator-api/pkg/pb/place"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
 
@@ -76,7 +77,7 @@ func Start(ctx context.Context) error {
 	driverName := viper.GetString("database.driver")
 	db, err := storage.NewDB(ctx, driverName)
 	if err != nil {
-		logger.Fatalf(ctx, "new DB initialization error: %s", err.Error())
+		return fmt.Errorf("new DB initialization error: %w", err)
 	}
 	defer db.Close()
 
@@ -113,16 +114,16 @@ func Start(ctx context.Context) error {
 
 	go func(ctx context.Context) {
 		for m := range icsMessages {
-			logger.InfoKV(ctx, "accepted new message", "body", m.Body)
+			logger.InfoKV(ctx, "accepted new message", zap.ByteString("body", m.Body))
 			event := ics.Event{}
 			err := json.Unmarshal(m.Body, &event)
 			if err != nil {
-				logger.Errorf(ctx, "JSON unmarshal error: %s", err.Error())
+				logger.ErrorKV(ctx, "JSON unmarshal error", zap.Error(err))
 				continue
 			}
 
 			if err := icsMessageHandler.Handle(ctx, event); err != nil {
-				logger.Errorf(ctx, "message handling error: %s", err.Error())
+				logger.ErrorKV(ctx, "message handling error", zap.Error(err))
 			}
 		}
 	}(ctx)

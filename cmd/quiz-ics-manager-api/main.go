@@ -41,7 +41,7 @@ func main() {
 			ElasticIndex:   viper.GetString("log.elastic.index"),
 		})
 		if err != nil {
-			logger.Fatal(ctx, "new elasticsearch client error: %s", err.Error())
+			logger.FatalKV(ctx, "new elasticsearch client error", zap.Error(err))
 		}
 
 		logger.Info(ctx, "initialized elasticsearch client")
@@ -52,7 +52,7 @@ func main() {
 	logger.SetGlobalLogger(logger.NewLogger(logLevel, logsCombiner, zap.Fields(
 		zap.String("module", viper.GetString("log.module_name")),
 	)))
-	logger.InfoKV(ctx, "initialized logger", "log level", logLevel)
+	logger.InfoKV(ctx, "initialized logger", zap.String("log_level", logLevel.String()))
 
 	g, ctx := errgroup.WithContext(ctx)
 

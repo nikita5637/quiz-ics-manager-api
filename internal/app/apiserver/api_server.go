@@ -32,7 +32,7 @@ func Start(ctx context.Context) error {
 	driverName := viper.GetString("database.driver")
 	db, err := storage.NewDB(ctx, driverName)
 	if err != nil {
-		logger.Fatalf(ctx, "new DB initialization error: %s", err.Error())
+		return fmt.Errorf("new DB initialization error: %w", err)
 	}
 	defer db.Close()
 

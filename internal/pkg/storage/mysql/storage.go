@@ -13,7 +13,7 @@ const (
 
 // NewDB ...
 func NewDB(ctx context.Context, dataSourceName string) (*sql.DB, error) {
-	logger.DebugKV(ctx, "initialize database connection started", "driverName", driverName, "DSN", dataSourceName)
+	logger.DebugKV(ctx, "initialize database connection started", "driver_name", driverName, "DSN", dataSourceName)
 	db, err := sql.Open(driverName, dataSourceName)
 	if err != nil {
 		return nil, err

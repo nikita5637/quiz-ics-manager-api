@@ -13,6 +13,7 @@ import (
 	gamepb "github.com/nikita5637/quiz-registrator-api/pkg/pb/game"
 	leaguepb "github.com/nikita5637/quiz-registrator-api/pkg/pb/league"
 	placepb "github.com/nikita5637/quiz-registrator-api/pkg/pb/place"
+	"go.uber.org/zap"
 )
 
 // Handle ...
@@ -21,7 +22,7 @@ func (h *Handler) Handle(ctx context.Context, event ics.Event) error {
 	case ics.EventRegistered:
 		_, err := h.icsFilesFacade.GetICSFileByGameID(ctx, event.GameID)
 		if err == nil {
-			logger.Warnf(ctx, "ICS file for game ID %d already exists", event.GameID)
+			logger.Warnf(ctx, "ICS file for game %d already exists", event.GameID)
 			return nil
 		}
 
@@ -61,7 +62,7 @@ func (h *Handler) Handle(ctx context.Context, event ics.Event) error {
 
 		placeAddress, err := h.placesFacade.GetAppleAddressByPlaceID(ctx, pbPlace.GetId())
 		if err != nil {
-			logger.Warnf(ctx, "get apple address by place ID error: %s", err.Error())
+			logger.WarnKV(ctx, "get apple address by place ID error", zap.Error(err), zap.Int32("place_id", pbPlace.GetId()))
 		} else {
 			address = placeAddress
 		}
@@ -105,7 +106,7 @@ func (h *Handler) Handle(ctx context.Context, event ics.Event) error {
 		icsFile, err := h.icsFilesFacade.GetICSFileByGameID(ctx, event.GameID)
 		if err != nil {
 			if errors.Is(err, model.ErrICSFileNotFound) {
-				logger.Warnf(ctx, "ICS file for game ID %d not found", event.GameID)
+				logger.Warnf(ctx, "ICS file for game %d not found", event.GameID)
 				return nil
 			}
 
