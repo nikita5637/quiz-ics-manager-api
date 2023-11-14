@@ -39,7 +39,7 @@ endif
 
 .PHONY: build
 build:
-	go build -o ics-manager-api ./cmd/quiz-ics-manager-api
+	go build -buildvcs=auto -o ics-manager-api ./cmd/quiz-ics-manager-api
 
 .PHONY: clean
 clean:
