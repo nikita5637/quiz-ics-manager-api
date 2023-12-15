@@ -11,8 +11,6 @@ services:
     command: "/bin/ics-manager-api --config /etc/config.toml"
     container_name: ics-manager-api
     environment:
-      DATABASE_CREDENTIALS_PASSWORD: quiz_regbot
-      ICS_CONSUMER_RABBITMQ_CREDENTIALS_PASSWORD: quiz_regbot
     networks:
       - network
     ports:
